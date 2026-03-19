@@ -46,7 +46,7 @@ secret_string           = jsonencode({
   DB_USERNAME = "mydbadmin"
   DB_PASSWORD = "kalyandb101"
 })
-recovery_window_in_days = 30
+recovery_window_in_days = 7
 force_delete            = false
 
 # Tags
