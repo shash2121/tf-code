@@ -12,7 +12,7 @@ variable "tags" {
 variable "db_username" {
   description = "Database username"
   type        = string
-  default     = "mydbadmin"
+  sensitive   = true
 }
 
 variable "db_password" {
