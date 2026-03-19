@@ -116,6 +116,36 @@ variable "db_password" {
   default     = "kalyandb101"
 }
 
+# Secrets Manager Variables
+variable "secret_name" {
+  description = "Name of the secret in Secrets Manager"
+  type        = string
+}
+
+variable "secret_description" {
+  description = "Description of the secret"
+  type        = string
+  default     = "Managed by Terraform"
+}
+
+variable "secret_string" {
+  description = "Secret string to store (JSON format)"
+  type        = string
+  sensitive   = true
+}
+
+variable "recovery_window_in_days" {
+  description = "Number of days to retain the secret before deletion (0-30)"
+  type        = number
+  default     = 30
+}
+
+variable "force_delete" {
+  description = "Force deletion without recovery window"
+  type        = bool
+  default     = false
+}
+
 variable "skip_final_snapshot" {
   description = "Whether to skip final snapshot when deleting RDS instance"
   type        = bool

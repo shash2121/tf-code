@@ -21,11 +21,13 @@ provider "aws" {
 
 # Secrets Manager Module - Store RDS credentials
 module "secrets_manager" {
-  source           = "./modules/secrets-manager"
-  environment_name = var.environment_name
-  tags             = var.tags
-  db_username      = var.db_username
-  db_password      = var.db_password
+  source                  = "./modules/secrets-manager"
+  secret_name             = var.secret_name
+  description             = var.secret_description
+  secret_string           = var.secret_string
+  recovery_window_in_days = var.recovery_window_in_days
+  force_delete            = var.force_delete
+  tags                    = var.tags
 }
 
 module "vpc" {

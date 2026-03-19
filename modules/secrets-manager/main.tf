@@ -1,13 +1,17 @@
-resource "aws_secretsmanager_secret" "rds_credentials" {
-  name = "${var.environment_name}-rds-credentials"
+resource "aws_secretsmanager_secret" "this" {
+  name                    = var.secret_name
+  description             = var.description
+  recovery_window_in_days = var.recovery_window_in_days
+  force_delete            = var.force_delete
 
   tags = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "rds_credentials_version" {
-  secret_id = aws_secretsmanager_secret.rds_credentials.id
-  secret_string = jsonencode({
-    DB_USERNAME = var.db_username
-    DB_PASSWORD = var.db_password
-  })
+resource "aws_secretsmanager_secret_version" "this" {
+  secret_id     = aws_secretsmanager_secret.this.id
+  secret_string = var.secret_string
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

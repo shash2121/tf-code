@@ -24,17 +24,6 @@ node_group_instance_types = ["t3.medium"]
 node_group_desired_size   = 1
 node_group_min_size       = 1
 node_group_max_size       = 3
-
-# Application Deployment Variables
-deploy_app                = true
-app_name                  = "nginx-demo"
-app_namespace             = "demo"
-app_replicas              = 2
-app_image                 = "nginx:latest"
-app_container_port        = 80
-app_service_port          = 80
-app_service_type          = "LoadBalancer"
-deploy_ingress_controller = true
 deploy_metrics_server     = true
 
 # RDS Variables
@@ -49,6 +38,16 @@ db_password             = "kalyandb101"
 skip_final_snapshot     = true
 publicly_accessible     = false
 backup_retention_period = 0
+
+# Secrets Manager Variables
+secret_name             = "dev-rds-credentials"
+secret_description      = "RDS database credentials for dev environment"
+secret_string           = jsonencode({
+  DB_USERNAME = "mydbadmin"
+  DB_PASSWORD = "kalyandb101"
+})
+recovery_window_in_days = 30
+force_delete            = false
 
 # Tags
 tags = {

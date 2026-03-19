@@ -1,22 +1,34 @@
-variable "environment_name" {
-  description = "Environment name (e.g., dev, staging, prod)"
+variable "secret_name" {
+  description = "Name of the secret"
   type        = string
+}
+
+variable "description" {
+  description = "Description of the secret"
+  type        = string
+  default     = "Managed by Terraform"
+}
+
+variable "secret_string" {
+  description = "Secret string to store (JSON format)"
+  type        = string
+  sensitive   = true
+}
+
+variable "recovery_window_in_days" {
+  description = "Number of days to retain the secret before deletion (0-30). Set to 0 for immediate deletion."
+  type        = number
+  default     = 30
+}
+
+variable "force_delete" {
+  description = "Force deletion without recovery window. Use with caution!"
+  type        = bool
+  default     = false
 }
 
 variable "tags" {
   description = "Tags to apply to the secret"
   type        = map(string)
   default     = {}
-}
-
-variable "db_username" {
-  description = "Database username"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
 }
