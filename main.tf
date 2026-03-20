@@ -84,10 +84,10 @@ module "rds" {
   engine_version          = var.engine_version
   instance_class          = var.instance_class
   db_name                 = var.db_name
-  username                = "catalog"
-  password                = "rootpassword"
-  db_subnet_group_name    = module.vpc.db_subnet_group_name        # Using VPC's DB subnet group
-  vpc_security_group_ids  = [module.vpc.default_security_group_id] # Using VPC's default security group
+  username                = var.db_username
+  password                = var.db_password
+  db_subnet_group_name    = module.vpc.db_subnet_group_name # Using VPC's DB subnet group
+  vpc_id                  = module.vpc.vpc_id               # VPC ID for security group
   skip_final_snapshot     = var.skip_final_snapshot
   publicly_accessible     = var.publicly_accessible
   backup_retention_period = var.backup_retention_period

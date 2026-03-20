@@ -1,3 +1,35 @@
+# RDS Security Group
+resource "aws_security_group" "rds_sg" {
+  name        = "${var.db_identifier}-sg"
+  description = "Security group for RDS instance ${var.db_identifier}"
+  vpc_id      = var.vpc_id
+
+  # Allow MySQL/Aurora port 3306 from anywhere
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "MySQL/Aurora access from anywhere"
+  }
+
+  # Allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.db_identifier}-rds-sg"
+    }
+  )
+}
+
+# RDS Instance
 resource "aws_db_instance" "rds_instance" {
   identifier              = var.db_identifier
   allocated_storage       = var.allocated_storage
@@ -9,7 +41,7 @@ resource "aws_db_instance" "rds_instance" {
   username                = var.username
   password                = var.password
   db_subnet_group_name    = var.db_subnet_group_name
-  vpc_security_group_ids  = var.vpc_security_group_ids
+  vpc_security_group_ids  = [aws_security_group.rds_sg.id]
   skip_final_snapshot     = var.skip_final_snapshot
   publicly_accessible     = var.publicly_accessible
   backup_retention_period = var.backup_retention_period

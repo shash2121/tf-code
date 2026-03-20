@@ -9,8 +9,4 @@ resource "aws_secretsmanager_secret" "this" {
 resource "aws_secretsmanager_secret_version" "this" {
   secret_id     = aws_secretsmanager_secret.this.id
   secret_string = jsonencode(var.secret_string)
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }

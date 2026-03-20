@@ -13,9 +13,7 @@ terraform {
 }
 
 data "aws_caller_identity" "current" {}
-
 data "aws_partition" "current" {}
-
 
 # EKS Cluster IAM Role
 resource "aws_iam_role" "cluster" {
@@ -25,11 +23,9 @@ resource "aws_iam_role" "cluster" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "eks.amazonaws.com" }
       }
     ]
   })
@@ -55,11 +51,9 @@ resource "aws_iam_role" "node_group" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "ec2.amazonaws.com" }
       }
     ]
   })
@@ -93,7 +87,6 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = var.cluster_endpoint_private_access
     endpoint_public_access  = var.cluster_endpoint_public_access
   }
-
 
   enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
@@ -133,34 +126,27 @@ resource "aws_eks_node_group" "node_group" {
   tags = merge(var.tags, { Name = var.node_group_name })
 }
 
-# ---------------------------- OIDC Provider ----------------------------
+# ----------------------------- EBS CSI Driver (Pod Identity) -----------------------------
 
-# Get TLS certificate thumbprint for OIDC
-data "tls_certificate" "eks" {
-  url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
-}
-
-# Create OIDC provider
-resource "aws_iam_openid_connect_provider" "eks" {
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
-  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
-
-  tags = {
-    Name        = "${var.cluster_name}-oidc"
-    Environment = var.environment
-  }
-}
-
-# ----------------------------------------------------------------------------------------
-
-# ----------------------------- EBS CSI Driver Configuration -----------------------------
-
-# EKS EBS CSI Driver IAM Role
+# IAM Role with Pod Identity trust policy
 resource "aws_iam_role" "ebs_csi_driver" {
   name = "AmazonEKS_EBS_CSI_DriverRole_${var.cluster_name}"
 
-  assume_role_policy = file("${path.module}/../aws-policies/ebs-csi-driver-trust-policy.json")
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "pods.eks.amazonaws.com"
+        }
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
+      }
+    ]
+  })
 
   tags = merge(var.tags, { Name = "AmazonEKS_EBS_CSI_DriverRole_${var.cluster_name}" })
 }
@@ -170,34 +156,46 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy" {
   role       = aws_iam_role.ebs_csi_driver.name
 }
 
-# EKS Pod Identity Association for EBS CSI Driver
-resource "aws_eks_pod_identity_association" "ebs_csi_controller" {
-  cluster_name    = aws_eks_cluster.cluster.name
-  namespace       = "kube-system" # EBS CSI controller typically runs in kube-system
-  service_account = "ebs-csi-controller-sa"
-  role_arn        = aws_iam_role.ebs_csi_driver.arn
-
-  tags = merge(var.tags, {
-    Name = "ebs-csi-controller-sa-${var.cluster_name}"
-  })
-}
-
-# EKS Add-on for AWS EBS CSI Driver
-resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name             = aws_eks_cluster.cluster.name
-  addon_name               = "aws-ebs-csi-driver"
-  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
+resource "aws_eks_addon" "pod_identity_agent" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "eks-pod-identity-agent"
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "PRESERVE"
 
-  tags = merge(var.tags, {
-    Name = "ebs-csi-driver-addon-${var.cluster_name}"
-  })
+  depends_on = [aws_eks_node_group.node_group]
+
+  tags = merge(var.tags, { Name = "pod-identity-agent-${var.cluster_name}" })
+}
+
+# Associate the IAM role with the EBS CSI service account
+resource "aws_eks_pod_identity_association" "ebs_csi_controller" {
+  cluster_name    = aws_eks_cluster.cluster.name
+  namespace       = "kube-system"
+  service_account = "ebs-csi-controller-sa"
+  role_arn        = aws_iam_role.ebs_csi_driver.arn
+
+  depends_on = [aws_eks_addon.pod_identity_agent]
+
+  tags = merge(var.tags, { Name = "ebs-csi-controller-sa-${var.cluster_name}" })
+}
+
+resource "aws_eks_addon" "ebs_csi_driver" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "aws-ebs-csi-driver"
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "PRESERVE"
+
+  timeouts {
+    create = "40m"
+  }
 
   depends_on = [
+    aws_eks_pod_identity_association.ebs_csi_controller,
+    aws_eks_addon.pod_identity_agent,
     aws_iam_role_policy_attachment.ebs_csi_driver_policy,
-    aws_iam_openid_connect_provider.eks, # now this exists
-    aws_eks_node_group.node_group,
   ]
+
+  tags = merge(var.tags, { Name = "ebs-csi-driver-addon-${var.cluster_name}" })
 }

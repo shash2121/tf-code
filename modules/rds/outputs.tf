@@ -28,3 +28,13 @@ output "db_instance_port" {
   description = "The port on which the database accepts connections"
   value       = aws_db_instance.rds_instance.port
 }
+
+output "security_group_id" {
+  description = "The ID of the RDS security group"
+  value       = aws_security_group.rds_sg.id
+}
+
+output "security_group_arn" {
+  description = "The ARN of the RDS security group"
+  value       = aws_security_group.rds_sg.arn
+}

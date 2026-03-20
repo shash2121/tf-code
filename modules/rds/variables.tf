@@ -57,9 +57,15 @@ variable "db_subnet_group_name" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "VPC ID where the RDS instance will be deployed"
+  type        = string
+}
+
 variable "vpc_security_group_ids" {
-  description = "List of VPC security group IDs to associate with the RDS instance"
+  description = "List of VPC security group IDs to associate with the RDS instance (deprecated - security group is now created in module)"
   type        = list(string)
+  default     = []
 }
 
 variable "skip_final_snapshot" {

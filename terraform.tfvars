@@ -32,7 +32,7 @@ storage_type            = "gp2"
 engine                  = "mysql"
 engine_version          = "8.0"
 instance_class          = "db.t3.micro"
-db_name                 = "mydatabase"
+db_name                 = "mydb"
 db_username             = "mydbadmin"
 db_password             = "kalyandb101"
 skip_final_snapshot     = true
@@ -46,8 +46,7 @@ secret_string = {
   DB_USERNAME = "mydbadmin"
   DB_PASSWORD = "kalyandb101"
 }
-recovery_window_in_days = 7
-force_delete            = false
+recovery_window_in_days = 0
 
 # Tags
 tags = {
