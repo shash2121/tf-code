@@ -130,7 +130,7 @@ variable "secret_description" {
 
 variable "secret_string" {
   description = "Secret string to store (JSON format)"
-  type        = string
+  type        = map(string)
   sensitive   = true
 }
 

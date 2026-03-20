@@ -18,7 +18,7 @@ EOF
 
 # EKS Variables
 cluster_name              = "dev-eks-cluster"
-cluster_version           = "1.31"
+cluster_version           = "1.34"
 node_group_name           = "dev-node-group"
 node_group_instance_types = ["t3.medium"]
 node_group_desired_size   = 1
@@ -40,12 +40,12 @@ publicly_accessible     = false
 backup_retention_period = 0
 
 # Secrets Manager Variables
-secret_name             = "dev-rds-credentials"
-secret_description      = "RDS database credentials for dev environment"
-secret_string           = jsonencode({
+secret_name        = "app-credentials"
+secret_description = "RDS database credentials for dev environment"
+secret_string = {
   DB_USERNAME = "mydbadmin"
   DB_PASSWORD = "kalyandb101"
-})
+}
 recovery_window_in_days = 7
 force_delete            = false
 

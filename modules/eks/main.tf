@@ -16,6 +16,7 @@ data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
 
+
 # EKS Cluster IAM Role
 resource "aws_iam_role" "cluster" {
   name = "${var.cluster_name}-cluster-role"
@@ -93,14 +94,6 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_public_access  = var.cluster_endpoint_public_access
   }
 
-  # Note: encryption_config requires a valid KMS key ARN. For simplicity, we're commenting this out.
-  # You can uncomment and provide a valid KMS key ARN when needed.
-  # encryption_config {
-  #   provider {
-  #     key_arn = "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
-  #   }
-  #   resources = ["secrets"]
-  # }
 
   enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
@@ -140,6 +133,29 @@ resource "aws_eks_node_group" "node_group" {
   tags = merge(var.tags, { Name = var.node_group_name })
 }
 
+# ---------------------------- OIDC Provider ----------------------------
+
+# Get TLS certificate thumbprint for OIDC
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+
+# Create OIDC provider
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+
+  tags = {
+    Name        = "${var.cluster_name}-oidc"
+    Environment = var.environment
+  }
+}
+
+# ----------------------------------------------------------------------------------------
+
+# ----------------------------- EBS CSI Driver Configuration -----------------------------
+
 # EKS EBS CSI Driver IAM Role
 resource "aws_iam_role" "ebs_csi_driver" {
   name = "AmazonEKS_EBS_CSI_DriverRole_${var.cluster_name}"
@@ -168,32 +184,20 @@ resource "aws_eks_pod_identity_association" "ebs_csi_controller" {
 
 # EKS Add-on for AWS EBS CSI Driver
 resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name                = aws_eks_cluster.cluster.name
-  addon_name                  = "aws-ebs-csi-driver"
+  cluster_name             = aws_eks_cluster.cluster.name
+  addon_name               = "aws-ebs-csi-driver"
+  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
+
   resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "OVERWRITE"
-  service_account_role_arn    = aws_iam_role.ebs_csi_driver.arn
+  resolve_conflicts_on_update = "PRESERVE"
 
   tags = merge(var.tags, {
     Name = "ebs-csi-driver-addon-${var.cluster_name}"
   })
-}
 
-
-# Optional: Deploy metrics-server
-resource "helm_release" "metrics_server" {
-  count = var.deploy_metrics_server ? 1 : 0
-
-  name       = "metrics-server"
-  repository = "https://kubernetes-sigs.github.io/metrics-server/"
-  chart      = "metrics-server"
-  version    = var.metrics_server_chart_version
-  namespace  = "kube-system"
-
-  set {
-    name  = "args[0]"
-    value = "--kubelet-insecure-tls"
-  }
-
-  depends_on = [aws_eks_addon.ebs_csi_driver]
+  depends_on = [
+    aws_iam_role_policy_attachment.ebs_csi_driver_policy,
+    aws_iam_openid_connect_provider.eks, # now this exists
+    aws_eks_node_group.node_group,
+  ]
 }

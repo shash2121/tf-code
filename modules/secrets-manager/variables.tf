@@ -11,7 +11,7 @@ variable "description" {
 
 variable "secret_string" {
   description = "Secret string to store (JSON format)"
-  type        = string
+  type        = map(string)
   sensitive   = true
 }
 
@@ -19,12 +19,6 @@ variable "recovery_window_in_days" {
   description = "Number of days to retain the secret before deletion (0-30). Set to 0 for immediate deletion."
   type        = number
   default     = 30
-}
-
-variable "force_delete" {
-  description = "Force deletion without recovery window. Use with caution!"
-  type        = bool
-  default     = false
 }
 
 variable "tags" {

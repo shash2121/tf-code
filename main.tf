@@ -26,7 +26,6 @@ module "secrets_manager" {
   description             = var.secret_description
   secret_string           = var.secret_string
   recovery_window_in_days = var.recovery_window_in_days
-  force_delete            = var.force_delete
   tags                    = var.tags
 }
 

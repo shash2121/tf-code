@@ -84,32 +84,6 @@ output "ebs_csi_addon_id" {
   value       = aws_eks_addon.ebs_csi_driver.id
 }
 
-# Application Deployment Outputs
-output "app_namespace_name" {
-  description = "The name of the application namespace"
-  value       = try(kubernetes_namespace.app[0].metadata[0].name, null)
-}
-
-output "app_deployment_name" {
-  description = "The name of the application deployment"
-  value       = try(kubernetes_deployment.app[0].metadata[0].name, null)
-}
-
-output "app_service_name" {
-  description = "The name of the application service"
-  value       = try(kubernetes_service.app[0].metadata[0].name, null)
-}
-
-output "app_service_load_balancer_dns" {
-  description = "The DNS name of the LoadBalancer service (if applicable)"
-  value       = try(kubernetes_service.app[0].status[0].load_balancer[0].ingress[0].hostname, null)
-}
-
-output "app_service_load_balancer_ip" {
-  description = "The IP of the LoadBalancer service (if applicable)"
-  value       = try(kubernetes_service.app[0].status[0].load_balancer[0].ingress[0].ip, null)
-}
-
 # Ingress Controller Outputs
 output "ingress_controller_deployed" {
   description = "Whether NGINX Ingress Controller was deployed"
