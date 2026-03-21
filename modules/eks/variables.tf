@@ -222,3 +222,21 @@ variable "metrics_server_chart_version" {
   type        = string
   default     = "3.12.0"
 }
+
+# AWS Load Balancer Controller Variables
+variable "deploy_aws_load_balancer_controller" {
+  description = "Whether to deploy AWS Load Balancer Controller"
+  type        = bool
+  default     = true
+}
+
+variable "aws_load_balancer_controller_chart_version" {
+  description = "Version of the AWS Load Balancer Controller chart"
+  type        = string
+  default     = "1.6.0"
+}
+
+variable "aws_region" {
+  description = "AWS region where the EKS cluster is deployed"
+  type        = string
+}

@@ -38,13 +38,31 @@ module "vpc" {
   subnet_newbits   = var.subnet_newbits
 }
 
+# EC2 Security Group Module
+module "ec2_security_group" {
+  source              = "./modules/security-group"
+  security_group_name = "${var.environment_name}-ec2-sg"
+  description         = "Security group for EC2 instance with SSH access"
+  vpc_id              = module.vpc.vpc_id
+  ingress_rules = {
+    ssh = {
+      description = "SSH access from anywhere"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    }
+  }
+  tags = var.tags
+}
+
 module "ec2" {
   source                 = "./modules/ec2"
   ami_id                 = var.ami_id
   instance_type          = var.instance_type
   region                 = var.region
-  subnet_id              = module.vpc.public_subnet_ids[0]        # Using first public subnet
-  vpc_security_group_ids = [module.vpc.default_security_group_id] # Using VPC's default security group
+  subnet_id              = module.vpc.public_subnet_ids[0] # Using first public subnet
+  vpc_security_group_ids = [module.ec2_security_group.security_group_id]
   key_name               = var.key_name
   user_data_script       = var.user_data_script
 }
@@ -61,6 +79,7 @@ module "eks" {
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.public_subnet_ids
   tags                      = var.tags
+  aws_region                = var.region
 
   # Metrics Server
   deploy_metrics_server = var.deploy_metrics_server

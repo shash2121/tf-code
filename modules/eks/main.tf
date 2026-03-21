@@ -126,11 +126,36 @@ resource "aws_eks_node_group" "node_group" {
   tags = merge(var.tags, { Name = var.node_group_name })
 }
 
-# ----------------------------- EBS CSI Driver (Pod Identity) -----------------------------
+# ----------------------------- EKS (Pod Identity) -----------------------------
 
-# IAM Role with Pod Identity trust policy
-resource "aws_iam_role" "ebs_csi_driver" {
-  name = "AmazonEKS_EBS_CSI_DriverRole_${var.cluster_name}"
+resource "aws_eks_addon" "pod_identity_agent" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "eks-pod-identity-agent"
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "PRESERVE"
+
+  depends_on = [aws_eks_node_group.node_group]
+
+  tags = merge(var.tags, { Name = "pod-identity-agent-${var.cluster_name}" })
+}
+
+# ------------------------------------ EKS Pod identity Association with SA ---------------------------------------
+
+# IAM Policy for accessing catalog DB secret from Secrets Manager
+resource "aws_iam_policy" "catalog_db_secret_policy" {
+  name        = "catalog-db-secret-policy"
+  description = "Policy for accessing catalog database secret from AWS Secrets Manager"
+
+  policy = file("/Users/shashwat/project/tf-code/modules/aws-policies/catalog-db-secret-policy.json")
+
+  tags = merge(var.tags, {
+    Name = "catalog-db-secret-policy"
+  })
+}
+
+resource "aws_iam_role" "catalog-db-secrets-role" {
+  name = "catalog-db-secrets-role_${var.cluster_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -148,54 +173,19 @@ resource "aws_iam_role" "ebs_csi_driver" {
     ]
   })
 
-  tags = merge(var.tags, { Name = "AmazonEKS_EBS_CSI_DriverRole_${var.cluster_name}" })
+  tags = merge(var.tags, { Name = "catalog-db-secrets-role_${var.cluster_name}" })
 }
 
-resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  role       = aws_iam_role.ebs_csi_driver.name
+resource "aws_iam_role_policy_attachment" "catalog_db_secret_policy_attachment" {
+  role       = aws_iam_role.catalog-db-secrets-role.name
+  policy_arn = aws_iam_policy.catalog_db_secret_policy.arn
 }
 
-resource "aws_eks_addon" "pod_identity_agent" {
-  cluster_name = aws_eks_cluster.cluster.name
-  addon_name   = "eks-pod-identity-agent"
-
-  resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "PRESERVE"
-
-  depends_on = [aws_eks_node_group.node_group]
-
-  tags = merge(var.tags, { Name = "pod-identity-agent-${var.cluster_name}" })
-}
-
-# Associate the IAM role with the EBS CSI service account
-resource "aws_eks_pod_identity_association" "ebs_csi_controller" {
+resource "aws_eks_pod_identity_association" "secrets_sa" {
   cluster_name    = aws_eks_cluster.cluster.name
-  namespace       = "kube-system"
-  service_account = "ebs-csi-controller-sa"
-  role_arn        = aws_iam_role.ebs_csi_driver.arn
+  namespace       = "default"
+  service_account = "catalog-mysql-sa"
+  role_arn        = aws_iam_role.catalog-db-secrets-role.arn
 
-  depends_on = [aws_eks_addon.pod_identity_agent]
-
-  tags = merge(var.tags, { Name = "ebs-csi-controller-sa-${var.cluster_name}" })
-}
-
-resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name = aws_eks_cluster.cluster.name
-  addon_name   = "aws-ebs-csi-driver"
-
-  resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "PRESERVE"
-
-  timeouts {
-    create = "40m"
-  }
-
-  depends_on = [
-    aws_eks_pod_identity_association.ebs_csi_controller,
-    aws_eks_addon.pod_identity_agent,
-    aws_iam_role_policy_attachment.ebs_csi_driver_policy,
-  ]
-
-  tags = merge(var.tags, { Name = "ebs-csi-driver-addon-${var.cluster_name}" })
+  tags = merge(var.tags, { Name = "catalog-mysql-sa-pia-${var.cluster_name}" })
 }

@@ -54,41 +54,41 @@ output "cluster_platform_version" {
   value       = aws_eks_cluster.cluster.platform_version
 }
 
-output "ebs_csi_driver_role_arn" {
-  description = "The ARN of the IAM role for EBS CSI driver"
-  value       = aws_iam_role.ebs_csi_driver.arn
-}
+# output "ebs_csi_driver_role_arn" {
+#   description = "The ARN of the IAM role for EBS CSI driver"
+#   value       = aws_iam_role.ebs_csi_driver.arn
+# }
 
-output "ebs_csi_driver_role_name" {
-  description = "The name of the IAM role for EBS CSI driver"
-  value       = aws_iam_role.ebs_csi_driver.name
-}
+# output "ebs_csi_driver_role_name" {
+#   description = "The name of the IAM role for EBS CSI driver"
+#   value       = aws_iam_role.ebs_csi_driver.name
+# }
 
-output "ebs_csi_pod_identity_association_id" {
-  description = "The ID of the EKS pod identity association for EBS CSI driver"
-  value       = aws_eks_pod_identity_association.ebs_csi_controller.id
-}
+# output "ebs_csi_pod_identity_association_id" {
+#   description = "The ID of the EKS pod identity association for EBS CSI driver"
+#   value       = aws_eks_pod_identity_association.ebs_csi_controller.id
+# }
 
-output "ebs_csi_pod_identity_association_arn" {
-  description = "The ARN of the EKS pod identity association for EBS CSI driver"
-  value       = aws_eks_pod_identity_association.ebs_csi_controller.association_arn
-}
+# output "ebs_csi_pod_identity_association_arn" {
+#   description = "The ARN of the EKS pod identity association for EBS CSI driver"
+#   value       = aws_eks_pod_identity_association.ebs_csi_controller.association_arn
+# }
 
-output "ebs_csi_addon_arn" {
-  description = "The ARN of the EKS addon for EBS CSI driver"
-  value       = aws_eks_addon.ebs_csi_driver.arn
-}
+# output "ebs_csi_addon_arn" {
+#   description = "The ARN of the EKS addon for EBS CSI driver"
+#   value       = aws_eks_addon.ebs_csi_driver.arn
+# }
 
-output "ebs_csi_addon_id" {
-  description = "The ID of the EKS addon for EBS CSI driver"
-  value       = aws_eks_addon.ebs_csi_driver.id
-}
+# output "ebs_csi_addon_id" {
+#   description = "The ID of the EKS addon for EBS CSI driver"
+#   value       = aws_eks_addon.ebs_csi_driver.id
+# }
 
-# Ingress Controller Outputs
-output "ingress_controller_deployed" {
-  description = "Whether NGINX Ingress Controller was deployed"
-  value       = var.deploy_ingress_controller
-}
+# # Ingress Controller Outputs
+# output "ingress_controller_deployed" {
+#   description = "Whether NGINX Ingress Controller was deployed"
+#   value       = var.deploy_ingress_controller
+# }
 
 output "ingress_controller_namespace" {
   description = "The namespace where NGINX Ingress Controller is deployed"

@@ -32,7 +32,7 @@ storage_type            = "gp2"
 engine                  = "mysql"
 engine_version          = "8.0"
 instance_class          = "db.t3.micro"
-db_name                 = "mydb"
+db_name                 = "catalogdb"
 db_username             = "mydbadmin"
 db_password             = "kalyandb101"
 skip_final_snapshot     = true
@@ -40,11 +40,11 @@ publicly_accessible     = false
 backup_retention_period = 0
 
 # Secrets Manager Variables
-secret_name        = "app-credentials"
+secret_name        = "catalog-db-secret-2"
 secret_description = "RDS database credentials for dev environment"
 secret_string = {
-  DB_USERNAME = "mydbadmin"
-  DB_PASSWORD = "kalyandb101"
+  MYSQL_USER     = "mydbadmin"
+  MYSQL_PASSWORD = "kalyandb101"
 }
 recovery_window_in_days = 0
 
