@@ -7,7 +7,7 @@ subnet_newbits   = 8
 ami_id           = "ami-02b8269d5e85954ef"
 instance_type    = "t2.micro"
 region           = "ap-south-1"
-key_name         = "dev"
+key_name         = "rsa-key"
 user_data_script = <<EOF
 #!/bin/bash
 sudo apt update -y
@@ -18,7 +18,7 @@ EOF
 
 # EKS Variables
 cluster_name              = "dev-eks-cluster"
-cluster_version           = "1.34"
+cluster_version           = "1.35"
 node_group_name           = "dev-node-group"
 node_group_instance_types = ["t3.medium"]
 node_group_desired_size   = 1
@@ -32,19 +32,19 @@ storage_type            = "gp2"
 engine                  = "mysql"
 engine_version          = "8.0"
 instance_class          = "db.t3.micro"
-db_name                 = "catalogdb"
-db_username             = "mydbadmin"
-db_password             = "kalyandb101"
+db_name                 = "shophub"
+db_username             = "root"
+db_password             = "password"
 skip_final_snapshot     = true
 publicly_accessible     = false
 backup_retention_period = 0
 
 # Secrets Manager Variables
-secret_name        = "catalog-db-secret-2"
+secret_name        = "dev-rds-credentials"
 secret_description = "RDS database credentials for dev environment"
 secret_string = {
-  MYSQL_USER     = "mydbadmin"
-  MYSQL_PASSWORD = "kalyandb101"
+  DB_USERNAME     = "root"
+  DB_PASSWORD = "password"
 }
 recovery_window_in_days = 0
 

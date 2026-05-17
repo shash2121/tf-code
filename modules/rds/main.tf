@@ -1,3 +1,7 @@
+# RDS Module - Main Configuration
+
+data "aws_caller_identity" "current" {}
+
 # RDS Security Group
 resource "aws_security_group" "rds_sg" {
   name        = "${var.db_identifier}-sg"

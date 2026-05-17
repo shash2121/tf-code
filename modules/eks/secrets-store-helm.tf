@@ -28,12 +28,12 @@ resource "helm_release" "csi_secrets_store" {
   # Recommended settings for production
   set {
     name  = "syncSecret.enabled"
-    value = "true"   # allows syncing secrets to k8s secrets
+    value = "true" # allows syncing secrets to k8s secrets
   }
 
   set {
     name  = "enableSecretRotation"
-    value = "true"   # auto-rotate secrets
+    value = "true" # auto-rotate secrets
   }
 
   depends_on = [aws_eks_addon.pod_identity_agent]
@@ -53,6 +53,6 @@ resource "helm_release" "secrets_provider_aws" {
 
   depends_on = [
     aws_eks_addon.pod_identity_agent,
-    helm_release.csi_secrets_store  # CSI driver must be installed first
+    helm_release.csi_secrets_store # CSI driver must be installed first
   ]
 }

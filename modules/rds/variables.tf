@@ -91,3 +91,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "aws_region" {
+  description = "AWS region where RDS is deployed"
+  type        = string
+  default     = "ap-south-1"
+}

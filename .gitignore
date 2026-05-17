@@ -5,6 +5,9 @@
 *.tfplan
 crash.log
 
+#Claude
+.claude
+
 # Terraform variables (optional - uncomment if you want to ignore tfvars)
 # *.tfvars
 # *.tfvars.json
