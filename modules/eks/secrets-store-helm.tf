@@ -33,7 +33,12 @@ resource "helm_release" "csi_secrets_store" {
 
   set {
     name  = "enableSecretRotation"
-    value = "true" # auto-rotate secrets
+    value = "true"
+  }
+
+  set {
+    name  = "tokenRequests[0].audience"
+    value = "pods.eks.amazonaws.com"
   }
 
   depends_on = [aws_eks_addon.pod_identity_agent]

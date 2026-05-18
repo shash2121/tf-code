@@ -5,7 +5,7 @@ subnet_newbits   = 8
 
 # EC2 Variables
 ami_id           = "ami-02b8269d5e85954ef"
-instance_type    = "t2.micro"
+instance_type    = "t3.small"
 region           = "ap-south-1"
 key_name         = "rsa-key"
 user_data_script = <<EOF
@@ -20,7 +20,7 @@ EOF
 cluster_name              = "dev-eks-cluster"
 cluster_version           = "1.35"
 node_group_name           = "dev-node-group"
-node_group_instance_types = ["t3.medium"]
+node_group_instance_types = ["m7i-flex.large"]
 node_group_desired_size   = 1
 node_group_min_size       = 1
 node_group_max_size       = 3
@@ -43,8 +43,8 @@ backup_retention_period = 0
 secret_name        = "dev-rds-credentials"
 secret_description = "RDS database credentials for dev environment"
 secret_string = {
-  DB_USERNAME     = "root"
-  DB_PASSWORD = "password"
+  MYSQL_USER     = "root"
+  MYSQL_PASSWORD = "password"
 }
 recovery_window_in_days = 0
 

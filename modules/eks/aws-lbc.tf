@@ -39,52 +39,57 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller" {
   policy_arn = aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn
 }
 
+resource "aws_eks_pod_identity_association" "aws_lbc_sa" {
+  cluster_name    = aws_eks_cluster.cluster.name
+  namespace       = "kube-system"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.aws_load_balancer_controller.arn
+
+  tags = merge(var.tags, { Name = "aws-lbc-pia-${var.cluster_name}" })
+}
+
 # AWS Load Balancer Controller Helm Chart
-# resource "helm_release" "aws_load_balancer_controller" {
-#   name       = "aws-load-balancer-controller"
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-load-balancer-controller"
-#   namespace  = "kube-system"
+resource "helm_release" "aws_load_balancer_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
 
-#   set {
-#     name  = "clusterName"
-#     value = aws_eks_cluster.cluster.name
-#   }
+  set {
+    name  = "clusterName"
+    value = aws_eks_cluster.cluster.name
+  }
 
-#   set {
-#     name  = "region"
-#     value = var.aws_region
-#   }
+  set {
+    name  = "region"
+    value = var.aws_region
+  }
 
-#   set {
-#     name  = "vpcId"
-#     value = var.vpc_id
-#   }
+  set {
+    name  = "vpcId"
+    value = var.vpc_id
+  }
 
-#   set {
-#     name  = "serviceAccount.create"
-#     value = "true"
-#   }
+  set {
+    name  = "serviceAccount.create"
+    value = "true"
+  }
 
-#   set {
-#     name  = "serviceAccount.name"
-#     value = "aws-load-balancer-controller"
-#   }
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
 
-#   set {
-#     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-#     value = aws_iam_role.aws_load_balancer_controller.arn
-#   }
+  depends_on = [
+    aws_iam_role.aws_load_balancer_controller,
+    aws_eks_pod_identity_association.aws_lbc_sa
+  ]
 
-#   depends_on = [
-#     aws_iam_role.aws_load_balancer_controller
-#   ]
-
-#   lifecycle {
-#     ignore_changes = [
-#       # Ignore changes to chart version to avoid unnecessary updates
-#       chart,
-#       version,
-#     ]
-#   }
-# }
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to chart version to avoid unnecessary updates
+      chart,
+      version,
+    ]
+  }
+}
