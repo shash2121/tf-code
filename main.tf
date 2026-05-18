@@ -36,6 +36,7 @@ module "vpc" {
   aws_region       = var.region
   tags             = var.tags
   subnet_newbits   = var.subnet_newbits
+  cluster_name     = var.cluster_name
 }
 
 # EC2 Security Group Module

@@ -29,3 +29,9 @@ variable "subnet_newbits" {
   type        = number
   default     = 8
 }
+
+variable "cluster_name" {
+  description = "EKS cluster name used for subnet tagging"
+  type        = string
+  default     = ""
+}
