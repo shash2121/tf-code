@@ -274,3 +274,34 @@ variable "deploy_metrics_server" {
   type        = bool
   default     = true
 }
+
+# Redis Variables
+variable "redis_identifier" {
+  description = "Identifier for the Redis cluster"
+  type        = string
+  default     = "dev-redis"
+}
+
+variable "redis_instance_type" {
+  description = "Instance type for Redis"
+  type        = string
+  default     = "cache.t3.small"
+}
+
+variable "redis_engine_version" {
+  description = "Redis engine version"
+  type        = string
+  default     = "7.0"
+}
+
+variable "redis_parameter_group_name" {
+  description = "Parameter group name for Redis"
+  type        = string
+  default     = "default.redis7"
+}
+
+variable "redis_port" {
+  description = "Port for Redis"
+  type        = number
+  default     = 6379
+}

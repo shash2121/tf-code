@@ -123,3 +123,18 @@ module "rds" {
   backup_retention_period = var.backup_retention_period
   tags                    = var.tags
 }
+
+# Redis Module
+module "redis" {
+  source                   = "./modules/redis"
+  redis_identifier         = var.redis_identifier
+  instance_type            = var.redis_instance_type
+  engine_version           = var.redis_engine_version
+  parameter_group_name     = var.redis_parameter_group_name
+  port                     = var.redis_port
+  subnet_ids               = module.vpc.private_subnet_ids
+  vpc_id                   = module.vpc.vpc_id
+  allowed_cidr_blocks      = [var.vpc_cidr]
+  environment              = var.environment_name
+  tags                     = var.tags
+}

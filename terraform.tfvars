@@ -56,3 +56,10 @@ tags = {
 
 # Route53 Variables
 domain_name = "infratocloud.xyz"
+
+# Redis Variables
+redis_identifier            = "dev-redis"
+redis_instance_type         = "cache.t3.small"
+redis_engine_version        = "7.0"
+redis_parameter_group_name  = "default.redis7"
+redis_port                  = 6379
