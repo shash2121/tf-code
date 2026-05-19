@@ -97,3 +97,9 @@ variable "aws_region" {
   type        = string
   default     = "ap-south-1"
 }
+
+variable "port" {
+  description = "The port for the database instance"
+  type        = number
+  default     = 3306
+}

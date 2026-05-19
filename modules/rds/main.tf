@@ -8,13 +8,13 @@ resource "aws_security_group" "rds_sg" {
   description = "Security group for RDS instance ${var.db_identifier}"
   vpc_id      = var.vpc_id
 
-  # Allow MySQL/Aurora port 3306 from anywhere
+  # Allow database access on configured port
   ingress {
-    from_port   = 3306
-    to_port     = 3306
+    from_port   = var.port
+    to_port     = var.port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "MySQL/Aurora access from anywhere"
+    description = "Database access from anywhere"
   }
 
   # Allow all outbound traffic
@@ -44,6 +44,7 @@ resource "aws_db_instance" "rds_instance" {
   db_name                 = var.db_name
   username                = var.username
   password                = var.password
+  port                    = var.port
   db_subnet_group_name    = var.db_subnet_group_name
   vpc_security_group_ids  = [aws_security_group.rds_sg.id]
   skip_final_snapshot     = var.skip_final_snapshot

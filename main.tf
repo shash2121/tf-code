@@ -124,6 +124,27 @@ module "rds" {
   tags                    = var.tags
 }
 
+# PostgreSQL RDS Module
+module "postgres_rds" {
+  source                  = "./modules/rds"
+  db_identifier           = var.postgres_db_identifier
+  allocated_storage       = var.postgres_allocated_storage
+  storage_type            = var.storage_type
+  engine                  = var.postgres_engine
+  engine_version          = var.postgres_engine_version
+  instance_class          = var.postgres_instance_class
+  db_name                 = var.postgres_db_name
+  username                = var.postgres_username
+  password                = var.postgres_password
+  port                    = var.postgres_port
+  db_subnet_group_name    = module.vpc.db_subnet_group_name
+  vpc_id                  = module.vpc.vpc_id
+  skip_final_snapshot     = var.skip_final_snapshot
+  publicly_accessible     = var.publicly_accessible
+  backup_retention_period = var.backup_retention_period
+  tags                    = var.tags
+}
+
 # Redis Module
 module "redis" {
   source                   = "./modules/redis"
@@ -148,4 +169,12 @@ module "dynamodb" {
   attributes   = var.dynamodb_attributes
   global_secondary_indexes = var.dynamodb_global_secondary_indexes
   tags         = var.tags
+}
+
+# SQS Module
+module "sqs" {
+  source      = "./modules/sqs"
+  queue_name  = var.sqs_queue_name
+  fifo_queue  = var.sqs_fifo_queue
+  tags        = var.tags
 }

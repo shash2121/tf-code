@@ -353,3 +353,72 @@ variable "dynamodb_global_secondary_indexes" {
     }
   ]
 }
+
+# PostgreSQL RDS Variables
+variable "postgres_db_identifier" {
+  description = "Identifier for the PostgreSQL RDS instance"
+  type        = string
+  default     = "orders-postgres-db"
+}
+
+variable "postgres_allocated_storage" {
+  description = "Allocated storage in GB for PostgreSQL"
+  type        = number
+  default     = 20
+}
+
+variable "postgres_engine" {
+  description = "Engine for PostgreSQL RDS"
+  type        = string
+  default     = "postgres"
+}
+
+variable "postgres_engine_version" {
+  description = "Engine version for PostgreSQL"
+  type        = string
+  default     = "16.3"
+}
+
+variable "postgres_instance_class" {
+  description = "Instance class for PostgreSQL"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "postgres_db_name" {
+  description = "Database name for PostgreSQL"
+  type        = string
+  default     = "ordersdb"
+}
+
+variable "postgres_username" {
+  description = "Username for PostgreSQL"
+  type        = string
+  default     = "postgres"
+}
+
+variable "postgres_password" {
+  description = "Password for PostgreSQL"
+  type        = string
+  sensitive   = true
+  default     = "postgres123"
+}
+
+variable "postgres_port" {
+  description = "Port for PostgreSQL"
+  type        = number
+  default     = 5432
+}
+
+# SQS Variables
+variable "sqs_queue_name" {
+  description = "Name of the SQS queue"
+  type        = string
+  default     = "dev-queue"
+}
+
+variable "sqs_fifo_queue" {
+  description = "Whether to create a FIFO queue"
+  type        = bool
+  default     = false
+}

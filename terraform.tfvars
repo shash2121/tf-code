@@ -79,3 +79,18 @@ dynamodb_global_secondary_indexes = [
     projection_type = "ALL"
   }
 ]
+
+# PostgreSQL RDS Variables
+postgres_db_identifier    = "orders-postgres-db"
+postgres_allocated_storage = 20
+postgres_engine           = "postgres"
+postgres_engine_version   = "17.6"
+postgres_instance_class   = "db.t3.micro"
+postgres_db_name          = "ordersdb"
+postgres_username         = "root"
+postgres_password         = "password"
+postgres_port             = 5432
+
+# SQS Variables
+sqs_queue_name  = "dev-orders-queue"
+message_retention_seconds   = 86400
