@@ -36,3 +36,18 @@ resource "aws_route53_record" "cname" {
   ttl     = var.cname_ttl
   records = [var.cname_target]
 }
+
+# A Record - Alias to ALB
+resource "aws_route53_record" "alb_alias" {
+  count = var.create_alias_record ? 1 : 0
+
+  zone_id = aws_route53_zone.public.zone_id
+  name    = var.alias_record_name != "" ? "${var.alias_record_name}.${var.domain_name}" : var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = var.alb_dns_name
+    zone_id                = var.alb_zone_id
+    evaluate_target_health = true
+  }
+}

@@ -94,6 +94,16 @@ module "route53" {
   tags        = var.tags
 }
 
+# ACM Module - SSL/TLS Certificate with DNS validation
+module "acm" {
+  source                    = "./modules/acm"
+  domain_name               = var.domain_name
+  subject_alternative_names = ["*.${var.domain_name}"]
+  zone_id                  = module.route53.hosted_zone_id
+  environment              = var.environment_name
+  tags                     = var.tags
+}
+
 # RDS Module
 module "rds" {
   source                  = "./modules/rds"
