@@ -63,3 +63,19 @@ redis_instance_type         = "cache.t3.small"
 redis_engine_version        = "7.0"
 redis_parameter_group_name  = "default.redis7"
 redis_port                  = 6379
+
+# DynamoDB Variables
+dynamodb_table_name         = "items"
+dynamodb_billing_mode       = "PAY_PER_REQUEST"
+dynamodb_hash_key           = "id"
+dynamodb_attributes = [
+  { name = "id",         type = "S" },
+  { name = "customerId", type = "S" },
+]
+dynamodb_global_secondary_indexes = [
+  {
+    name            = "idx_global_customerId"
+    hash_key        = "customerId"
+    projection_type = "ALL"
+  }
+]

@@ -90,8 +90,8 @@ module "eks" {
 module "route53" {
   source      = "./modules/route53"
   domain_name = var.domain_name
-  environment = var.environment_name
-  tags        = var.tags
+  environment              = var.environment_name
+  tags                     = var.tags
 }
 
 # ACM Module - SSL/TLS Certificate with DNS validation
@@ -137,4 +137,15 @@ module "redis" {
   allowed_cidr_blocks      = [var.vpc_cidr]
   environment              = var.environment_name
   tags                     = var.tags
+}
+
+# DynamoDB Module
+module "dynamodb" {
+  source       = "./modules/dynamodb"
+  table_name   = var.dynamodb_table_name
+  billing_mode = var.dynamodb_billing_mode
+  hash_key     = var.dynamodb_hash_key
+  attributes   = var.dynamodb_attributes
+  global_secondary_indexes = var.dynamodb_global_secondary_indexes
+  tags         = var.tags
 }

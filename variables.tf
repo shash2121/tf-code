@@ -305,3 +305,51 @@ variable "redis_port" {
   type        = number
   default     = 6379
 }
+
+# DynamoDB Variables
+variable "dynamodb_table_name" {
+  description = "Name of the DynamoDB table"
+  type        = string
+  default     = "items"
+}
+
+variable "dynamodb_billing_mode" {
+  description = "Billing mode for DynamoDB table"
+  type        = string
+  default     = "PAY_PER_REQUEST"
+}
+
+variable "dynamodb_hash_key" {
+  description = "Hash key for DynamoDB table"
+  type        = string
+  default     = "id"
+}
+
+variable "dynamodb_attributes" {
+  description = "List of attribute definitions for DynamoDB"
+  type = list(object({
+    name = string
+    type = string
+  }))
+  default = [
+    { name = "id",         type = "S" },
+    { name = "customerId", type = "S" },
+  ]
+}
+
+variable "dynamodb_global_secondary_indexes" {
+  description = "List of global secondary index configurations"
+  type = list(object({
+    name            = string
+    hash_key        = string
+    range_key       = optional(string)
+    projection_type = string
+  }))
+  default = [
+    {
+      name            = "idx_global_customerId"
+      hash_key        = "customerId"
+      projection_type = "ALL"
+    }
+  ]
+}
