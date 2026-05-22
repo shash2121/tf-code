@@ -184,7 +184,7 @@ resource "aws_iam_role_policy_attachment" "catalog_db_secret_policy_attachment" 
 resource "aws_eks_pod_identity_association" "secrets_sa" {
   cluster_name    = aws_eks_cluster.cluster.name
   namespace       = "default"
-  service_account = "catalog-mysql-sa"
+  service_account = "catalog"
   role_arn        = aws_iam_role.catalog-db-secrets-role.arn
 
   tags = merge(var.tags, { Name = "catalog-mysql-sa-pia-${var.cluster_name}" })

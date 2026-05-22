@@ -32,7 +32,7 @@ storage_type            = "gp2"
 engine                  = "mysql"
 engine_version          = "8.0"
 instance_class          = "db.t3.micro"
-db_name                 = "shophub"
+db_name                 = "catalogdb"
 db_username             = "root"
 db_password             = "password"
 skip_final_snapshot     = true
@@ -65,7 +65,7 @@ redis_parameter_group_name  = "default.redis7"
 redis_port                  = 6379
 
 # DynamoDB Variables
-dynamodb_table_name         = "items"
+dynamodb_table_name         = "Items"
 dynamodb_billing_mode       = "PAY_PER_REQUEST"
 dynamodb_hash_key           = "id"
 dynamodb_attributes = [
