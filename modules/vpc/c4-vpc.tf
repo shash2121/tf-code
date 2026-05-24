@@ -25,7 +25,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(var.tags, {
     Name                                          = "${var.environment_name}-public-${each.key}",
-    "kubernetes.io/cluster/${var.cluster_name}"   = "shared",
+    "kubernetes.io/cluster/${var.cluster_name}"   = "owned",
     "kubernetes.io/role/elb"                      = "1"
   })
 }
@@ -38,7 +38,7 @@ resource "aws_subnet" "private" {
   availability_zone = each.key
   tags = merge(var.tags, {
     Name                                          = "${var.environment_name}-private-${each.key}",
-    "kubernetes.io/cluster/${var.cluster_name}"   = "shared",
+    "kubernetes.io/cluster/${var.cluster_name}"   = "owned",
     "kubernetes.io/role/internal-elb"             = "1"
   })
 }

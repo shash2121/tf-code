@@ -32,6 +32,9 @@ resource "aws_iam_role_policy_attachment" "externaldns_managed_policy" {
 # ExternalDNS Pod Identity Association
 ##############################################
 resource "aws_eks_pod_identity_association" "externaldns" {
+    depends_on = [
+    aws_eks_node_group.node_group
+  ]  
   cluster_name    = "${var.cluster_name}"
   namespace       = "external-dns"
   service_account = "external-dns"
