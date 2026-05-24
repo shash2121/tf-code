@@ -16,6 +16,7 @@ data "aws_iam_policy_document" "karpenter_controller_assume" {
 }
 
 resource "aws_iam_role" "karpenter_controller" {
+  depends_on = [aws_eks_node_group.node_group]
   name               = "${var.cluster_name}-karpenter-controller-role"
   assume_role_policy = data.aws_iam_policy_document.karpenter_controller_assume.json
   tags               = var.tags
@@ -539,6 +540,7 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_attach" {
 # -------------------------------- Karpenter Pod Identity Association -------------------------
 
 resource "aws_eks_pod_identity_association" "karpenter" {
+  depends_on = [aws_eks_node_group.node_group]
   cluster_name    = "${var.cluster_name}"
   namespace       = "kube-system"
   service_account = "karpenter"
@@ -557,6 +559,7 @@ data "aws_iam_policy_document" "node_assume" {
 }
 
 resource "aws_iam_role" "karpenter_node" {
+  depends_on = [aws_eks_node_group.node_group]
   name               = "${var.cluster_name}-karpenter-node-role"
   assume_role_policy = data.aws_iam_policy_document.node_assume.json
   tags               = var.tags
@@ -631,6 +634,7 @@ resource "helm_release" "karpenter" {
 # ---------------------------------- SQS queue -----------------------------------
 
 resource "aws_sqs_queue" "karpenter_interruption" {
+  depends_on = [aws_eks_node_group.node_group]
   name                      = "${var.cluster_name}-karpenter-interruption"
   message_retention_seconds = 300
   sqs_managed_sse_enabled   = true
@@ -665,23 +669,6 @@ resource "aws_sqs_queue_policy" "karpenter_interruption" {
     ]
   })
 }
-
-# ------------------------------------------------------------------------
-# ============================================================================
-# Purpose:
-#   EventBridge rules that detect EC2 Spot interruptions, AWS Health events,
-#   EC2 rebalance recommendations, and EC2 instance state changes, and send
-#   those events to the Karpenter SQS interruption queue.
-#
-#   This enables Karpenter to gracefully cordon, drain, and replace Spot nodes.
-#
-# Requirements:
-#   - SQS queue must exist (aws_sqs_queue.karpenter_interruption)
-#   - IAM policy for Karpenter controller must include sqs:* permissions
-#
-# Reference:
-#   AWS Official Karpenter template:
-#   https://github.com/aws/karpenter/
 # ----------------------------------------------------------------------------
 # AWS Health Events → SQS
 # ----------------------------------------------------------------------------
