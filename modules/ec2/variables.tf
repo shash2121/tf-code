@@ -7,13 +7,13 @@ variable "instance_type" {
 variable "ami_id" {
   description = "AMI ID for EC2 instances"
   type        = string
-  default     = "ami-02b8269d5e85954ef"
+  default     = "ami-091138d0f0d41ff90"
 }
 
 variable "region" {
   description = "AWS region"
   type        = string
-  default     = "ap-south-1"
+  default     = "us-east-1"
 }
 
 variable "subnet_id" {
@@ -31,7 +31,7 @@ variable "vpc_security_group_ids" {
 variable "key_name" {
   description = "Key pair name for the EC2 instance"
   type        = string
-  default     = "dev"
+  default     = "useast"
 }
 
 variable "user_data_script" {

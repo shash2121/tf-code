@@ -4,10 +4,11 @@ environment_name = "dev"
 subnet_newbits   = 8
 
 # EC2 Variables
-ami_id           = "ami-02b8269d5e85954ef"
+#ami_id           = "ami-02b8269d5e85954ef"
+ami_id           = "ami-091138d0f0d41ff90"
 instance_type    = "t3.small"
-region           = "ap-south-1"
-key_name         = "rsa-key"
+region           = "us-east-1"
+key_name         = "useast"
 user_data_script = <<EOF
 #!/bin/bash
 sudo apt update -y
@@ -43,8 +44,9 @@ backup_retention_period = 0
 secret_name        = "dev-rds-credentials"
 secret_description = "RDS database credentials for dev environment"
 secret_string = {
-  MYSQL_USER     = "root"
-  MYSQL_PASSWORD = "password"
+  JWT_SECRET     = "bTMeK1+H3Fh2juFA+4i6h5zgUHwij3s0cWV72XgKpwBj6WTYFDKr93nb2hjPDpdz"
+  DB_USERNAME     = "postgres"
+  DB_PASSWORD = "postgres"
 }
 recovery_window_in_days = 0
 
@@ -81,16 +83,16 @@ dynamodb_global_secondary_indexes = [
 ]
 
 # PostgreSQL RDS Variables
-postgres_db_identifier    = "orders-postgres-db"
+postgres_db_identifier    = "linkshrink-postgres-db"
 postgres_allocated_storage = 20
 postgres_engine           = "postgres"
 postgres_engine_version   = "17.6"
 postgres_instance_class   = "db.t3.micro"
-postgres_db_name          = "ordersdb"
-postgres_username         = "root"
-postgres_password         = "password"
+postgres_db_name          = "urlshortener"
+postgres_username         = "postgres"
+postgres_password         = "postgres"
 postgres_port             = 5432
 
 # SQS Variables
-sqs_queue_name  = "dev-orders-queue"
+sqs_queue_name  = "linkshrink-orders-queue"
 message_retention_seconds   = 86400
