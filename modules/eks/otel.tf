@@ -102,6 +102,7 @@ resource "aws_iam_role_policy_attachment" "adot_collector" {
 # ---------------------------------------------------------------------------
 # ADOT Collector Pod Identity Association
 resource "aws_eks_pod_identity_association" "adot_collector" {
+  depends_on = [aws_eks_node_group.node_group]
   cluster_name    = "${var.cluster_name}"
   namespace       = "default"
   service_account = "adot-collector"

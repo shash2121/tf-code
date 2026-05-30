@@ -149,20 +149,20 @@ resource "aws_eks_addon" "pod_identity_agent" {
 
 # ------------------------------------ EKS Pod identity Association with SA ---------------------------------------
 
-# IAM Policy for accessing catalog DB secret from Secrets Manager
-resource "aws_iam_policy" "catalog_db_secret_policy" {
-  name        = "catalog-db-secret-policy"
+# IAM Policy for accessing DB secret from Secrets Manager
+resource "aws_iam_policy" "db_secret_policy" {
+  name        = "db-secret-policy"
   description = "Policy for accessing catalog database secret from AWS Secrets Manager"
 
-  policy = file("/Users/shashwat/project/tf-code/modules/aws-policies/catalog-db-secret-policy.json")
+  policy = file("/Users/shashwat/project/tf-code/modules/aws-policies/db-secret-policy.json")
 
   tags = merge(var.tags, {
-    Name = "catalog-db-secret-policy"
+    Name = "db-secret-policy"
   })
 }
 
-resource "aws_iam_role" "catalog-db-secrets-role" {
-  name = "catalog-db-secrets-role_${var.cluster_name}"
+resource "aws_iam_role" "db-secrets-role" {
+  name = "db-secrets-role_${var.cluster_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -180,19 +180,19 @@ resource "aws_iam_role" "catalog-db-secrets-role" {
     ]
   })
 
-  tags = merge(var.tags, { Name = "catalog-db-secrets-role_${var.cluster_name}" })
+  tags = merge(var.tags, { Name = "db-secrets-role_${var.cluster_name}" })
 }
 
-resource "aws_iam_role_policy_attachment" "catalog_db_secret_policy_attachment" {
-  role       = aws_iam_role.catalog-db-secrets-role.name
-  policy_arn = aws_iam_policy.catalog_db_secret_policy.arn
+resource "aws_iam_role_policy_attachment" "db_secret_policy_attachment" {
+  role       = aws_iam_role.db-secrets-role.name
+  policy_arn = aws_iam_policy.db_secret_policy.arn
 }
 
 resource "aws_eks_pod_identity_association" "secrets_sa" {
   cluster_name    = aws_eks_cluster.cluster.name
   namespace       = "default"
-  service_account = "catalog"
-  role_arn        = aws_iam_role.catalog-db-secrets-role.arn
+  service_account = "linkshrink"
+  role_arn        = aws_iam_role.db-secrets-role.arn
 
-  tags = merge(var.tags, { Name = "catalog-mysql-sa-pia-${var.cluster_name}" })
+  tags = merge(var.tags, { Name = "linkshrink-sa-pia-${var.cluster_name}" })
 }
