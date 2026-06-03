@@ -84,6 +84,11 @@ module "eks" {
 
   # Metrics Server
   deploy_metrics_server = var.deploy_metrics_server
+
+  # ArgoCD
+  deploy_argocd              = var.deploy_argocd
+  argocd_chart_version       = var.argocd_chart_version
+  argocd_server_service_type = var.argocd_server_service_type
 }
 
 # Route53 Module - Public Hosted Zone

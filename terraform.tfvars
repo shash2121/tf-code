@@ -22,10 +22,11 @@ cluster_name              = "dev-eks-cluster"
 cluster_version           = "1.35"
 node_group_name           = "dev-node-group"
 node_group_instance_types = ["m7i-flex.large"]
-node_group_desired_size   = 1
+node_group_desired_size   = 2
 node_group_min_size       = 1
 node_group_max_size       = 3
 deploy_metrics_server     = true
+deploy_argocd             = true
 
 # RDS Variables
 allocated_storage       = 20

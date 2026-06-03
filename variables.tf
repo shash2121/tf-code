@@ -422,3 +422,22 @@ variable "sqs_fifo_queue" {
   type        = bool
   default     = false
 }
+
+# ArgoCD Variables
+variable "deploy_argocd" {
+  description = "Whether to deploy ArgoCD on the EKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "argocd_chart_version" {
+  description = "Version of the ArgoCD Helm chart"
+  type        = string
+  default     = "7.3.11"
+}
+
+variable "argocd_server_service_type" {
+  description = "Service type for ArgoCD server (LoadBalancer, ClusterIP, NodePort)"
+  type        = string
+  default     = "LoadBalancer"
+}

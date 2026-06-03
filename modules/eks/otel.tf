@@ -195,7 +195,7 @@ data "aws_eks_addon_version" "prometheus_node_exporter_latest" {
 
 # EKS Add-on: Prometheus Node Exporter 
 resource "aws_eks_addon" "prometheus_node_exporter" {
-  depends_on = [aws_eks_cluster.cluster]  
+  depends_on = [aws_eks_node_group.node_group]  
   cluster_name  = aws_eks_cluster.cluster.name
   addon_name    = "prometheus-node-exporter"
   addon_version = data.aws_eks_addon_version.prometheus_node_exporter_latest.version  
@@ -221,7 +221,7 @@ data "aws_eks_addon_version" "kube_state_metrics_latest" {
 
 # EKS Add-on: Kube State Metrics
 resource "aws_eks_addon" "kube_state_metrics" {
-  depends_on = [aws_eks_cluster.cluster]    
+  depends_on = [aws_eks_node_group.node_group]    
   cluster_name  = aws_eks_cluster.cluster.name
   addon_name    = "kube-state-metrics"
   addon_version = data.aws_eks_addon_version.kube_state_metrics_latest.version  

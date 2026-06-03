@@ -100,3 +100,14 @@ output "metrics_server_deployed" {
   description = "Whether metrics-server was deployed"
   value       = var.deploy_metrics_server
 }
+
+# ArgoCD Output
+output "argocd_deployed" {
+  description = "Whether ArgoCD was deployed"
+  value       = var.deploy_argocd
+}
+
+output "argocd_namespace" {
+  description = "The namespace where ArgoCD is deployed"
+  value       = var.deploy_argocd ? "argocd" : null
+}
